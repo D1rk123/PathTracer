@@ -1,1 +1,4 @@
 .vs
+*.ppm
+Debug
+PathTracer/Debug
