@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ImagePpm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OrthographicCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -37,6 +34,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageRgb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

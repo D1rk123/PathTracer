@@ -1,25 +1,65 @@
 #include <limits>
 #include <algorithm>
 
+#include "Constants.h"
+
 #include "RayTracer.h"
 
-float RayTracer::testIntersection(Ray ray)
+RayTracer::IntersectionResult RayTracer::testIntersection(const Ray& ray)
 {
     //std::cout << ray.orig.x << ", " << ray.orig.y << ", " << ray.orig.z << std::endl;
     //return (ray.orig.x > 0) != (ray.orig.y > 0);
-    float distance = std::numeric_limits<float>::infinity();
-    for (Sphere sphere : spheres)
-    {
-        distance = std::fmin(distance, sphere.testIntersection(ray));
-    }
+    IntersectionResult result;
+    result.distance = std::numeric_limits<float>::infinity();
+    result.color = glm::vec3(1.0, 0.0, 0.0);
+
     for (Plane plane : planes)
     {
-        distance = std::fmin(distance, plane.testIntersection(ray));
+        float foundDistance = plane.testIntersection(ray);
+        if (foundDistance < result.distance)
+        {
+            result.distance = foundDistance;
+            result.color = plane.color;
+            result.normal = plane.normal;
+        }
     }
-    return distance;
+    for (Sphere sphere : spheres)
+    {
+        float foundDistance = sphere.testIntersection(ray);
+        if (foundDistance < result.distance)
+        {
+            result.distance = foundDistance;
+            result.color = sphere.color;
+            auto intersectionPoint = ray.orig + ray.dir * foundDistance;
+            result.normal = glm::normalize(intersectionPoint - sphere.pos);
+        }
+    }
+    return result;
 }
 
-ImagePpm RayTracer::render()
+glm::vec3 RayTracer::calcDirectIllumination(const Ray& ray, const IntersectionResult& intersection)
+{
+    glm::vec3 illum(0, 0, 0);
+    constexpr float scale = 2 * 4 * Constants::pi * Constants::pi;
+    glm::vec3 point = ray.orig + ray.dir * intersection.distance;
+
+    for (const auto& light : lightSources)
+    {
+        auto relLightPos = light.pos - point;
+        float lightDistance = glm::length(relLightPos);
+
+        Ray toLight(point, relLightPos/lightDistance);
+        auto lightIntersection = testIntersection(toLight);
+        if (lightIntersection.distance > lightDistance)
+        {
+            float radiance = light.power * (glm::dot(toLight.dir, intersection.normal)) / (scale * lightDistance * lightDistance);
+            illum += (light.color * intersection.color) * radiance;
+        }
+    }
+    return illum;
+}
+
+ImagePpm RayTracer::renderDepth()
 {
     ImagePpm result(cam->resX(), cam->resY());
     for (int x = 0; x < cam->resX(); ++x)
@@ -27,11 +67,34 @@ ImagePpm RayTracer::render()
         for (int y = 0; y < cam->resY(); ++y)
         {
             //std::cout << x << ", " << y << std::endl;
-            const float intersectionDistance = testIntersection(cam->generateRay(x, y));
-            const float intersectionNormalized = std::clamp<float>((1.0f - intersectionDistance/10.0f)*255, 0, 255);
+            auto intersection = testIntersection(cam->generateRay(x, y));
+            const float intersectionNormalized = std::clamp<float>((1.0f - intersection.distance/10.0f)*255, 0, 255);
             const unsigned char shade = static_cast<unsigned char>(intersectionNormalized);
             //const unsigned char shade = (intersectionDistance == std::numeric_limits<float>::infinity()) ? 0 : 255;
             result.set(x, y, { shade, shade, shade });
+        }
+    }
+    return result;
+}
+
+ImageRgb<float> RayTracer::renderDirectLight()
+{
+    ImageRgb<float> result(cam->resX(), cam->resY());
+    for (int x = 0; x < cam->resX(); ++x)
+    {
+        for (int y = 0; y < cam->resY(); ++y)
+        {
+            const auto ray = cam->generateRay(x, y);
+            auto intersection = testIntersection(ray);
+            if (intersection.distance == std::numeric_limits<float>::infinity())
+            {
+                result.set(x, y, { 0, 0, 0 });
+            }
+            else
+            {
+                auto pixColor = calcDirectIllumination(ray, intersection);
+                result.set(x, y, { pixColor.x, pixColor.y, pixColor.z });
+            }
         }
     }
     return result;

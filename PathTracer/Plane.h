@@ -4,14 +4,19 @@
 
 #include <limits>
 #include <glm/glm.hpp>
+
+#include "Constants.h"
+
 #include "Ray.h"
 
 struct Plane
 {
     const glm::vec3 normal;
     const float offset;
+    const glm::vec3 color;
 
-    Plane(glm::vec3 normal, float offset) : normal(normal), offset(offset)
+    Plane(const glm::vec3 normal, const float offset, const glm::vec3 color)
+        : normal(normal), offset(offset), color(color)
     {
     }
 
@@ -26,7 +31,7 @@ struct Plane
         }
         const float distance = (offset - origDistance) / localDir;
 
-        if (distance < 0)
+        if (distance < Constants::minIntersectionDistance)
         {
             return std::numeric_limits<float>::infinity();
         }

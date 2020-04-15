@@ -4,17 +4,27 @@
 #include <glm/glm.hpp>
 #include "Sphere.h"
 #include "Plane.h"
+#include "PointLight.h"
 #include "Ray.h"
 #include "Camera.h"
-#include "ImagePpm.h"
+#include "ImageRgb.h"
 
 class RayTracer
 {
     std::unique_ptr<Camera> cam;
     std::vector<Sphere> spheres;
     std::vector<Plane> planes;
+    std::vector<PointLight> lightSources;
 
-    float testIntersection(Ray ray);
+    struct IntersectionResult
+    {
+        float distance;
+        glm::vec3 normal;
+        glm::vec3 color;
+    };
+
+    IntersectionResult testIntersection(const Ray& ray);
+    glm::vec3 calcDirectIllumination(const Ray& ray, const IntersectionResult& intersection);
 
 public:
     RayTracer(std::unique_ptr<Camera> initCam): cam(std::move(initCam))
@@ -29,6 +39,11 @@ public:
     {
         planes.push_back(plane);
     }
+    void addPointLight(const PointLight& light)
+    {
+        lightSources.push_back(light);
+    }
 
-    ImagePpm render();
+    ImagePpm renderDepth();
+    ImageRgb<float> renderDirectLight();
 };

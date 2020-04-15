@@ -158,13 +158,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="PerspectiveCamera.h" />
+    <ClInclude Include="PointLight.h" />
     <ClInclude Include="RayTracer.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="OrthographicCamera.h" />
-    <ClInclude Include="ImagePpm.h" />
+    <ClInclude Include="ImageRgb.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

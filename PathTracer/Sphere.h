@@ -2,14 +2,18 @@
 
 #include <limits>
 #include <glm/glm.hpp>
+
 #include "Ray.h"
+#include "Constants.h"
 
 struct Sphere
 {
     const glm::vec3 pos;
     const float radius;
+    const glm::vec3 color;
 
-    Sphere(glm::vec3 pos, float radius) : pos(pos), radius(radius)
+    Sphere(const glm::vec3 pos, const float radius, const glm::vec3 color)
+        : pos(pos), radius(radius), color(color)
     {
     }
 
@@ -30,11 +34,11 @@ struct Sphere
         const float distance1 = (-b + discriminant) / 2.0f;
         const float distance2 = (-b - discriminant) / 2.0f;
         float finalDistance = std::numeric_limits<float>::infinity();
-        if (distance1 > 0)
+        if (distance1 > Constants::minIntersectionDistance)
         {
             finalDistance = distance1;
         }
-        if (distance2 > 0 && distance2 < finalDistance)
+        if (distance2 > Constants::minIntersectionDistance && distance2 < finalDistance)
         {
             finalDistance = distance2;
         }
