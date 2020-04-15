@@ -77,24 +77,25 @@ ImagePpm RayTracer::renderDepth()
     return result;
 }
 
-ImageRgb<float> RayTracer::renderDirectLight()
+ImageRgb<float> RayTracer::renderDirectLight(int numSamples)
 {
     ImageRgb<float> result(cam->resX(), cam->resY());
     for (int x = 0; x < cam->resX(); ++x)
     {
         for (int y = 0; y < cam->resY(); ++y)
         {
-            const auto ray = cam->generateRay(x, y);
-            auto intersection = testIntersection(ray);
-            if (intersection.distance == std::numeric_limits<float>::infinity())
+            glm::vec3 pixelColor(0, 0, 0);
+            for (int i = 0; i < numSamples; ++i)
             {
-                result.set(x, y, { 0, 0, 0 });
+                const auto ray = cam->generateRay(x, y);
+                auto intersection = testIntersection(ray);
+                if (intersection.distance != std::numeric_limits<float>::infinity())
+                {
+                    pixelColor += calcDirectIllumination(ray, intersection);
+                }
             }
-            else
-            {
-                auto pixColor = calcDirectIllumination(ray, intersection);
-                result.set(x, y, { pixColor.x, pixColor.y, pixColor.z });
-            }
+            pixelColor /= numSamples;
+            result.set(x, y, { pixelColor.x, pixelColor.y, pixelColor.z });
         }
     }
     return result;

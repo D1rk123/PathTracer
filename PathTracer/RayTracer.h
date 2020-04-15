@@ -45,5 +45,5 @@ public:
     }
 
     ImagePpm renderDepth();
-    ImageRgb<float> renderDirectLight();
+    ImageRgb<float> renderDirectLight(int numSamples);
 };
