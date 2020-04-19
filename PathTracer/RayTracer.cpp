@@ -30,7 +30,7 @@ public:
             return { -1, -1 };
         }
         
-        int currPercentFinished = std::round(static_cast<double>(currPixelNum) * 100 / lastPixel);
+        int currPercentFinished = static_cast<int>(std::round(static_cast<double>(currPixelNum) * 100 / lastPixel));
         if (currPercentFinished != percentFinished)
         {
             percentFinished = currPercentFinished;
@@ -135,15 +135,19 @@ ImageRgb<float> RayTracer::renderDirectLight(int numSamples)
 
 void RayTracer::renderPixel(int x, int y, ImageRgb<float>* result, int numSamples)
 {
+    std::random_device rd;
+    std::mt19937 mersenneTwister(rd());
+    std::uniform_real_distribution<float> rouletteSampler(0, 1);
+    const float rouletteFactor = 0.85f;
     glm::vec3 pixelColor(0, 0, 0);
     for (int i = 0; i < numSamples; ++i)
     {
         IntersectionResult intersection;
         glm::vec3 reflectionScale(1, 1, 1);
-        int numBounces = 0;
+        bool continueTracing = true;
         Ray ray = cam->generateRay(x, y);
 
-        while (numBounces < 5)
+        while (continueTracing)
         {
             intersection = testIntersection(ray);
             if (intersection.distance == std::numeric_limits<float>::infinity())
@@ -155,16 +159,22 @@ void RayTracer::renderPixel(int x, int y, ImageRgb<float>* result, int numSample
             reflectionScale *= intersection.color;
             pixelColor += reflectionScale * calcDirectIllumination(intersectionPoint, intersection);
 
-            //make new ray
-            float normalDot = glm::dot(ray.dir, intersection.normal);
-            ray.orig = intersectionPoint;
-            ray.dir = glm::ballRand(1.0f);
-            reflectionScale *= std::fabsf(normalDot) * (1 / Constants::pi);
-            if (normalDot < 0)
+            if (rouletteSampler(mersenneTwister) > rouletteFactor)
             {
-                ray.dir.x = -ray.dir.x;
+                //make new ray
+                float normalDot = glm::dot(ray.dir, intersection.normal);
+                ray.orig = intersectionPoint;
+                ray.dir = glm::ballRand(1.0f);
+                reflectionScale *= std::fabsf(normalDot) * (1 / Constants::pi) * (1 / rouletteFactor);
+                if (normalDot < 0)
+                {
+                    ray.dir.x = -ray.dir.x;
+                }
             }
-            numBounces++;
+            else
+            {
+                continueTracing = false;
+            }
         }
     }
     pixelColor /= numSamples;

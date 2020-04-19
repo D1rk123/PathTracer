@@ -29,7 +29,7 @@ RayTracer makeFloatingBallsScene()
 
 RayTracer makeCornellBoxScene()
 {
-    RayTracer tracer(std::make_unique<PerspectiveCamera>(1400, 1000, glm::mat3(1.0f), glm::vec3(0, 0, 0), 90.0f));
+    RayTracer tracer(std::make_unique<PerspectiveCamera>(1050, 750, glm::mat3(1.0f), glm::vec3(0, 0, 0), 90.0f));
     tracer.addPlane(Plane({ 0,1,0 }, -1, { 0.85, 0.85, 0.85 }));
     tracer.addPlane(Plane({ 0,-1,0 }, -1, { 0.85, 0.85, 0.85 }));
     tracer.addPlane(Plane({ 1,0,0 }, -1, { 0.85, 0, 0 }));
@@ -50,6 +50,6 @@ int main()
     //ImagePpm::writeToPpm(depthImg, "depth.ppm");
     auto directIllumImg = tracer.renderDirectLight(1);
     ImagePpm::writeToPpm(directIllumImg.convertTo8Bit(), "directIllum.ppm");
-    auto resultImg = tracer.render(5000, 11);
+    auto resultImg = tracer.render(25000, 11);
     ImagePpm::writeToPpm(resultImg.convertTo8Bit(), "fullResult.ppm");
 }
