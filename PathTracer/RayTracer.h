@@ -22,9 +22,13 @@ class RayTracer
         glm::vec3 normal;
         glm::vec3 color;
     };
+    class workDistributor;
 
     IntersectionResult testIntersection(const Ray& ray);
-    glm::vec3 calcDirectIllumination(const Ray& ray, const IntersectionResult& intersection);
+    glm::vec3 calcDirectIllumination(const glm::vec3& point, const IntersectionResult& intersection);
+    void renderThread(ImageRgb<float>* result, int numSamples, workDistributor* distributor);
+    void renderPixel(int x, int y, ImageRgb<float>* result, int numSamples);
+
 
 public:
     RayTracer(std::unique_ptr<Camera> initCam): cam(std::move(initCam))
@@ -46,4 +50,5 @@ public:
 
     ImagePpm renderDepth();
     ImageRgb<float> renderDirectLight(int numSamples);
+    ImageRgb<float> render(int numSamples, int numThreads);
 };

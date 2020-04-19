@@ -60,18 +60,19 @@ public:
     {
         ImageRgb<unsigned char> result(resolutionX, resolutionY);
 
-        /*auto sortedPixelData = pixelData;
+        auto sortedPixelData = pixelData;
         std::sort(sortedPixelData.begin(), sortedPixelData.end());
-        double max = sortedPixelData[sortedPixelData.size() * 0.8];
-        std::cout << max << std::endl;*/
+        double max = (sortedPixelData[sortedPixelData.size() * 0.5] + sortedPixelData[sortedPixelData.size()*0.95]*2)/3;
+        std::cout << max << std::endl;
         
         //double max = static_cast<double>(*std::max_element(pixelData.cbegin(), pixelData.cend()));
 
-        double max = 0.01;
+        //double max = 0.01;
 
         for (unsigned int i=0; i<pixelData.size(); i++)
         {
             const double normalized = static_cast<double>(pixelData[i]) / max;
+            const double toneMapped = pow(normalized, 0.25);
             const double scaled = std::clamp<double>(std::round(normalized*255), 0, 255);
             result.set(i, static_cast<unsigned char>(scaled));
         }

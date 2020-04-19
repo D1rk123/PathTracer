@@ -154,6 +154,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
+    <ClCompile Include="Ray.cpp" />
     <ClCompile Include="RayTracer.cpp" />
   </ItemGroup>
   <ItemGroup>

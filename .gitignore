@@ -2,3 +2,5 @@
 *.ppm
 Debug
 PathTracer/Debug
+Release
+PathTracer/Release
