@@ -6,14 +6,15 @@
 #include <glm/glm.hpp>
 
 #include "Constants.h"
-
 #include "Ray.h"
+#include "SceneObject.h"
 
-struct Plane
+class Plane : public SceneObject
 {
     const glm::vec3 normal;
     const float offset;
     const glm::vec3 color;
+public:
 
     Plane(const glm::vec3 normal, const float offset, const glm::vec3 color)
         : normal(normal), offset(offset), color(color)
@@ -21,20 +22,20 @@ struct Plane
     }
 
     //Two-sided intersection test
-    float testIntersection(const Ray ray)
+    IntersectionResult testIntersection(const Ray ray) override
     {
         const float origDistance = glm::dot(ray.orig, normal);
         const float localDir = glm::dot(ray.dir, normal);
         if (localDir == 0)
         {
-            return std::numeric_limits<float>::infinity();
+            return IntersectionResult::makeNoIntersectionFound();
         }
         const float distance = (offset - origDistance) / localDir;
 
         if (distance < Constants::minIntersectionDistance)
         {
-            return std::numeric_limits<float>::infinity();
+            return IntersectionResult::makeNoIntersectionFound();
         }
-        return distance;
+        return IntersectionResult(distance, normal, color);
     }
 };

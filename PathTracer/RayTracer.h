@@ -2,8 +2,7 @@
 
 #include <vector>
 #include <glm/glm.hpp>
-#include "Sphere.h"
-#include "Plane.h"
+#include "SceneObject.h"
 #include "PointLight.h"
 #include "Ray.h"
 #include "Camera.h"
@@ -12,16 +11,9 @@
 class RayTracer
 {
     std::unique_ptr<Camera> cam;
-    std::vector<Sphere> spheres;
-    std::vector<Plane> planes;
+    std::vector<std::unique_ptr<SceneObject>> objects;
     std::vector<PointLight> lightSources;
 
-    struct IntersectionResult
-    {
-        float distance;
-        glm::vec3 normal;
-        glm::vec3 color;
-    };
     class workDistributor;
 
     IntersectionResult testIntersection(const Ray& ray);
@@ -31,17 +23,15 @@ class RayTracer
 
 
 public:
-    RayTracer(std::unique_ptr<Camera> initCam): cam(std::move(initCam))
+    template <class CameraType>
+    RayTracer(CameraType&& camera): cam(std::make_unique<CameraType>(std::forward<CameraType>(camera)))
     {
     }
 
-    void addSphere(const Sphere& sphere)
+    template <class ObjectType>
+    void addObject(ObjectType&& object)
     {
-        spheres.push_back(sphere);
-    }
-    void addPlane(const Plane& plane)
-    {
-        planes.push_back(plane);
+        objects.emplace_back(std::make_unique<ObjectType>(std::forward<ObjectType>(object)));
     }
     void addPointLight(const PointLight& light)
     {

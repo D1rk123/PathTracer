@@ -163,10 +163,12 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="IntersectionResult.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="RayTracer.h" />
+    <ClInclude Include="SceneObject.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="OrthographicCamera.h" />

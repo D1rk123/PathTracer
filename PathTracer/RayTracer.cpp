@@ -40,31 +40,16 @@ public:
     }
 };
 
-RayTracer::IntersectionResult RayTracer::testIntersection(const Ray& ray)
+IntersectionResult RayTracer::testIntersection(const Ray& ray)
 {
-    IntersectionResult result;
-    result.distance = std::numeric_limits<float>::infinity();
-    result.color = glm::vec3(1.0, 0.0, 0.0);
+    IntersectionResult result = IntersectionResult::makeNoIntersectionFound();
 
-    for (Plane plane : planes)
+    for (const auto& object : objects)
     {
-        float foundDistance = plane.testIntersection(ray);
-        if (foundDistance < result.distance)
+        auto foundResult = object->testIntersection(ray);
+        if (foundResult.distance < result.distance)
         {
-            result.distance = foundDistance;
-            result.color = plane.color;
-            result.normal = plane.normal;
-        }
-    }
-    for (Sphere sphere : spheres)
-    {
-        float foundDistance = sphere.testIntersection(ray);
-        if (foundDistance < result.distance)
-        {
-            result.distance = foundDistance;
-            result.color = sphere.color;
-            auto intersectionPoint = ray.orig + ray.dir * foundDistance;
-            result.normal = glm::normalize(intersectionPoint - sphere.pos);
+            result = foundResult;
         }
     }
     return result;

@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include "RayTracer.h"
 #include "Sphere.h"
+#include "plane.h"
 #include "Ray.h"
 #include "OrthographicCamera.h"
 #include "PerspectiveCamera.h"
@@ -13,12 +14,12 @@
 
 RayTracer makeFloatingBallsScene()
 {
-    RayTracer tracer(std::make_unique<PerspectiveCamera>(2100, 1500, glm::mat3(1.0f), glm::vec3(0, 0, 0), 70.0f));
+    RayTracer tracer(PerspectiveCamera(2100, 1500, glm::mat3(1.0f), glm::vec3(0, 0, 0), 70.0f));
     for (int i = 0; i < 15; ++i)
     {
-        tracer.addSphere(Sphere({ -0.75 + 0.55 * i, -0.6 + 0.4 * i, 4 + 2 * i }, 0.4f, { 1, 1, 1 }));
+        tracer.addObject(Sphere({ -0.75 + 0.55 * i, -0.6 + 0.4 * i, 4 + 2 * i }, 0.4f, { 1, 1, 1 }));
     }
-    tracer.addPlane(Plane({ 0,1,0 }, -1, { 1, 1, 1 }));
+    tracer.addObject(Plane({ 0,1,0 }, -1, { 1, 1, 1 }));
     tracer.addPointLight(PointLight({ 0, 2.5,  2 }, { 1, 0.3, 0.1 }, 10));
     tracer.addPointLight(PointLight({ 0, 2.0,  8.5 }, { 0, 0.2, 1.0 }, 3));
     tracer.addPointLight(PointLight({ -1, 0.1, 0 }, { 0, 1, 0 }, 10));
@@ -29,13 +30,13 @@ RayTracer makeFloatingBallsScene()
 
 RayTracer makeCornellBoxSceneOneColorBigShadow()
 {
-    RayTracer tracer(std::make_unique<PerspectiveCamera>(1050, 750, glm::mat3(1.0f), glm::vec3(0, 0, 0), 90.0f));
-    tracer.addPlane(Plane({ 0,1,0 }, -1, { 0.85, 0.85, 0.85 }));
-    tracer.addPlane(Plane({ 0,-1,0 }, -1, { 0.85, 0.85, 0.85 }));
-    tracer.addPlane(Plane({ 1,0,0 }, -1, { 0.85, 0.85, 0.85 }));
-    tracer.addPlane(Plane({ -1,0,0 }, -1, { 0.85, 0.85, 0.85 }));
-    tracer.addPlane(Plane({ 0,0,-1 }, -2, { 0.85, 0.85, 0.85 }));
-    tracer.addSphere(Sphere({ 0, 0.4, 1 }, 0.2f, { 0.85, 0.85, 0.85 }));
+    RayTracer tracer(PerspectiveCamera(1050, 750, glm::mat3(1.0f), glm::vec3(0, 0, 0), 90.0f));
+    tracer.addObject(Plane({ 0,1,0 }, -1, { 0.85, 0.85, 0.85 }));
+    tracer.addObject(Plane({ 0,-1,0 }, -1, { 0.85, 0.85, 0.85 }));
+    tracer.addObject(Plane({ 1,0,0 }, -1, { 0.85, 0.85, 0.85 }));
+    tracer.addObject(Plane({ -1,0,0 }, -1, { 0.85, 0.85, 0.85 }));
+    tracer.addObject(Plane({ 0,0,-1 }, -2, { 0.85, 0.85, 0.85 }));
+    tracer.addObject(Sphere({ 0, 0.4, 1 }, 0.2f, { 0.85, 0.85, 0.85 }));
     tracer.addPointLight(PointLight({ 0, 0.95, 1 }, { 0.85, 0.85, 0.85 }, 2));
 
     return tracer;
@@ -43,14 +44,14 @@ RayTracer makeCornellBoxSceneOneColorBigShadow()
 
 RayTracer makeCornellBoxScene()
 {
-    RayTracer tracer(std::make_unique<PerspectiveCamera>(1050, 750, glm::mat3(1.0f), glm::vec3(0, 0, 0), 90.0f));
-    tracer.addPlane(Plane({ 0,1,0 }, -1, { 0.85, 0.85, 0.85 }));
-    tracer.addPlane(Plane({ 0,-1,0 }, -1, { 0.85, 0.85, 0.85 }));
-    tracer.addPlane(Plane({ 1,0,0 }, -1, { 0.85, 0, 0 }));
-    tracer.addPlane(Plane({ -1,0,0 }, -1, { 0, 0.85, 0 }));
-    tracer.addPlane(Plane({ 0,0,-1 }, -2, { 0.85, 0.85, 0.85 }));
-    tracer.addSphere(Sphere({ -0.35, -0.65, 1.5}, 0.35f, { 0.85, 0.85, 0.85 }));
-    tracer.addSphere(Sphere({ 0.55, -0.35, 1.25}, 0.25f, { 0.85, 0.85, 0.85 }));
+    RayTracer tracer(PerspectiveCamera(1050, 750, glm::mat3(1.0f), glm::vec3(0, 0, 0), 90.0f));
+    tracer.addObject(Plane({ 0,1,0 }, -1, { 0.85, 0.85, 0.85 }));
+    tracer.addObject(Plane({ 0,-1,0 }, -1, { 0.85, 0.85, 0.85 }));
+    tracer.addObject(Plane({ 1,0,0 }, -1, { 0.85, 0, 0 }));
+    tracer.addObject(Plane({ -1,0,0 }, -1, { 0, 0.85, 0 }));
+    tracer.addObject(Plane({ 0,0,-1 }, -2, { 0.85, 0.85, 0.85 }));
+    tracer.addObject(Sphere({ -0.35, -0.65, 1.5}, 0.35f, { 0.85, 0.85, 0.85 }));
+    tracer.addObject(Sphere({ 0.55, -0.35, 1.25}, 0.25f, { 0.85, 0.85, 0.85 }));
     tracer.addPointLight(PointLight({ 0, 0.95, 1 }, { 0.85, 0.85, 0.85 }, 2));
 
     return tracer;
