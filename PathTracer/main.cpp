@@ -27,6 +27,20 @@ RayTracer makeFloatingBallsScene()
     return tracer;
 }
 
+RayTracer makeCornellBoxSceneOneColorBigShadow()
+{
+    RayTracer tracer(std::make_unique<PerspectiveCamera>(1050, 750, glm::mat3(1.0f), glm::vec3(0, 0, 0), 90.0f));
+    tracer.addPlane(Plane({ 0,1,0 }, -1, { 0.85, 0.85, 0.85 }));
+    tracer.addPlane(Plane({ 0,-1,0 }, -1, { 0.85, 0.85, 0.85 }));
+    tracer.addPlane(Plane({ 1,0,0 }, -1, { 0.85, 0.85, 0.85 }));
+    tracer.addPlane(Plane({ -1,0,0 }, -1, { 0.85, 0.85, 0.85 }));
+    tracer.addPlane(Plane({ 0,0,-1 }, -2, { 0.85, 0.85, 0.85 }));
+    tracer.addSphere(Sphere({ 0, 0.4, 1 }, 0.2f, { 0.85, 0.85, 0.85 }));
+    tracer.addPointLight(PointLight({ 0, 0.95, 1 }, { 0.85, 0.85, 0.85 }, 2));
+
+    return tracer;
+}
+
 RayTracer makeCornellBoxScene()
 {
     RayTracer tracer(std::make_unique<PerspectiveCamera>(1050, 750, glm::mat3(1.0f), glm::vec3(0, 0, 0), 90.0f));
@@ -36,11 +50,12 @@ RayTracer makeCornellBoxScene()
     tracer.addPlane(Plane({ -1,0,0 }, -1, { 0, 0.85, 0 }));
     tracer.addPlane(Plane({ 0,0,-1 }, -2, { 0.85, 0.85, 0.85 }));
     tracer.addSphere(Sphere({ -0.35, -0.65, 1.5}, 0.35f, { 0.85, 0.85, 0.85 }));
-    tracer.addSphere(Sphere({ 0.55, -0.75, 1.25}, 0.25f, { 0.85, 0.85, 0.85 }));
+    tracer.addSphere(Sphere({ 0.55, -0.35, 1.25}, 0.25f, { 0.85, 0.85, 0.85 }));
     tracer.addPointLight(PointLight({ 0, 0.95, 1 }, { 0.85, 0.85, 0.85 }, 2));
 
     return tracer;
 }
+
 
 int main()
 {
@@ -49,7 +64,8 @@ int main()
     //auto depthImg = tracer.renderDepth();
     //ImagePpm::writeToPpm(depthImg, "depth.ppm");
     auto directIllumImg = tracer.renderDirectLight(1);
-    ImagePpm::writeToPpm(directIllumImg.convertTo8Bit(), "directIllum.ppm");
-    auto resultImg = tracer.render(25000, 11);
-    ImagePpm::writeToPpm(resultImg.convertTo8Bit(), "fullResult.ppm");
+    directIllumImg.writeToPpm("directIllum.ppm");
+    auto resultImg = tracer.render(2500, 11);
+    resultImg.writeToExr("fullResult.exr");
+    resultImg.writeToPpm("fullResult.ppm");
 }

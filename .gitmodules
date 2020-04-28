@@ -1,9 +1,6 @@
 [submodule "glm"]
 	path = glm
 	url = https://github.com/g-truc/glm.git
-[submodule "openexr"]
-	path = openexr
-	url = https://github.com/AcademySoftwareFoundation/openexr.git
-[submodule "zlib"]
-	path = zlib
-	url = https://github.com/madler/zlib
+[submodule "tinyexr"]
+	path = tinyexr
+	url = https://github.com/syoyo/tinyexr.git

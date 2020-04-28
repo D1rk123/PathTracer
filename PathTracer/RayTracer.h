@@ -25,9 +25,9 @@ class RayTracer
     class workDistributor;
 
     IntersectionResult testIntersection(const Ray& ray);
-    glm::vec3 calcDirectIllumination(const glm::vec3& point, const IntersectionResult& intersection);
-    void renderThread(ImageRgb<float>* result, int numSamples, workDistributor* distributor);
-    void renderPixel(int x, int y, ImageRgb<float>* result, int numSamples);
+    glm::vec3 calcDirectIllumination(const glm::vec3& point, const glm::vec3& intersectionNormal);
+    void renderThread(ImageRgb* result, int numSamples, workDistributor* distributor);
+    void renderPixel(int x, int y, ImageRgb* result, int numSamples);
 
 
 public:
@@ -48,7 +48,7 @@ public:
         lightSources.push_back(light);
     }
 
-    ImagePpm renderDepth();
-    ImageRgb<float> renderDirectLight(int numSamples);
-    ImageRgb<float> render(int numSamples, int numThreads);
+    ImageRgb renderDepth();
+    ImageRgb renderDirectLight(int numSamples);
+    ImageRgb render(int numSamples, int numThreads);
 };

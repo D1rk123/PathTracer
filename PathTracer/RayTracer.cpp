@@ -70,7 +70,7 @@ RayTracer::IntersectionResult RayTracer::testIntersection(const Ray& ray)
     return result;
 }
 
-glm::vec3 RayTracer::calcDirectIllumination(const glm::vec3& point, const IntersectionResult& intersection)
+glm::vec3 RayTracer::calcDirectIllumination(const glm::vec3& point, const glm::vec3& intersectionNormal)
 {
     glm::vec3 illum(0, 0, 0);
 
@@ -83,34 +83,30 @@ glm::vec3 RayTracer::calcDirectIllumination(const glm::vec3& point, const Inters
         auto lightIntersection = testIntersection(toLight);
         if (lightIntersection.distance > lightDistance)
         {
-            float radiance = light.power * (glm::dot(toLight.dir, intersection.normal)) / (4 * Constants::pi * lightDistance * lightDistance);
+            float radiance = light.power * (glm::dot(toLight.dir, intersectionNormal) / (4 * Constants::pi * lightDistance * lightDistance));
             illum += light.color * radiance;
         }
     }
     return illum;
 }
 
-ImagePpm RayTracer::renderDepth()
+ImageRgb RayTracer::renderDepth()
 {
-    ImagePpm result(cam->resX(), cam->resY());
+    ImageRgb result(cam->resX(), cam->resY());
     for (int x = 0; x < cam->resX(); ++x)
     {
         for (int y = 0; y < cam->resY(); ++y)
         {
-            //std::cout << x << ", " << y << std::endl;
             auto intersection = testIntersection(cam->generateRay(x, y));
-            const float intersectionNormalized = std::clamp<float>((1.0f - intersection.distance/10.0f)*255, 0, 255);
-            const unsigned char shade = static_cast<unsigned char>(intersectionNormalized);
-            //const unsigned char shade = (intersectionDistance == std::numeric_limits<float>::infinity()) ? 0 : 255;
-            result.set(x, y, { shade, shade, shade });
+            result.set(x, y, { intersection.distance, intersection.distance, intersection.distance });
         }
     }
     return result;
 }
 
-ImageRgb<float> RayTracer::renderDirectLight(int numSamples)
+ImageRgb RayTracer::renderDirectLight(int numSamples)
 {
-    ImageRgb<float> result(cam->resX(), cam->resY());
+    ImageRgb result(cam->resX(), cam->resY());
     for (int x = 0; x < cam->resX(); ++x)
     {
         for (int y = 0; y < cam->resY(); ++y)
@@ -123,22 +119,23 @@ ImageRgb<float> RayTracer::renderDirectLight(int numSamples)
                 if (intersection.distance != std::numeric_limits<float>::infinity())
                 {
                     glm::vec3 point = ray.orig + ray.dir * intersection.distance;
-                    pixelColor += intersection.color * calcDirectIllumination(point, intersection);
+                    pixelColor += intersection.color * (1 / Constants::pi) * calcDirectIllumination(point, intersection.normal);
                 }
             }
             pixelColor /= numSamples;
-            result.set(x, y, { pixelColor.x, pixelColor.y, pixelColor.z });
+            result.set(x, y, pixelColor);
         }
     }
     return result;
 }
 
-void RayTracer::renderPixel(int x, int y, ImageRgb<float>* result, int numSamples)
+void RayTracer::renderPixel(int x, int y, ImageRgb* result, int numSamples)
 {
     std::random_device rd;
     std::mt19937 mersenneTwister(rd());
     std::uniform_real_distribution<float> rouletteSampler(0, 1);
-    const float rouletteFactor = 0.85f;
+    constexpr float rouletteFactor = 0.85f;
+    //glm::vec<3, double> pixelColor(0, 0, 0);
     glm::vec3 pixelColor(0, 0, 0);
     for (int i = 0; i < numSamples; ++i)
     {
@@ -157,19 +154,20 @@ void RayTracer::renderPixel(int x, int y, ImageRgb<float>* result, int numSample
             glm::vec3 intersectionPoint = ray.orig + ray.dir * intersection.distance;
 
             reflectionScale *= intersection.color;
-            pixelColor += reflectionScale * calcDirectIllumination(intersectionPoint, intersection);
+            pixelColor += reflectionScale * calcDirectIllumination(intersectionPoint, intersection.normal) * (1 / Constants::pi);
 
             if (rouletteSampler(mersenneTwister) > rouletteFactor)
             {
                 //make new ray
-                float normalDot = glm::dot(ray.dir, intersection.normal);
                 ray.orig = intersectionPoint;
                 ray.dir = glm::ballRand(1.0f);
-                reflectionScale *= std::fabsf(normalDot) * (1 / Constants::pi) * (1 / rouletteFactor);
-                if (normalDot < 0)
+                float dotNewNormal = glm::dot(ray.dir, intersection.normal);
+                if (dotNewNormal < 0)
                 {
-                    ray.dir.x = -ray.dir.x;
+                    ray.dir = -ray.dir;
+                    dotNewNormal = -dotNewNormal;
                 }
+                reflectionScale *= (1 / rouletteFactor) * dotNewNormal * 2;
             }
             else
             {
@@ -178,10 +176,10 @@ void RayTracer::renderPixel(int x, int y, ImageRgb<float>* result, int numSample
         }
     }
     pixelColor /= numSamples;
-    result->set(x, y, { pixelColor.x, pixelColor.y, pixelColor.z });
+    result->set(x, y, pixelColor);
 }
 
-void RayTracer::renderThread(ImageRgb<float>* result, int numSamples, workDistributor* distributor)
+void RayTracer::renderThread(ImageRgb* result, int numSamples, workDistributor* distributor)
 {
     auto pixel = distributor->getNextPixel();
     while(pixel.first != -1)
@@ -191,9 +189,9 @@ void RayTracer::renderThread(ImageRgb<float>* result, int numSamples, workDistri
     }
 }
 
-ImageRgb<float> RayTracer::render(int numSamples, int numThreads)
+ImageRgb RayTracer::render(int numSamples, int numThreads)
 {
-    ImageRgb<float> result(cam->resX(), cam->resY());
+    ImageRgb result(cam->resX(), cam->resY());
     workDistributor distributor(cam->resX(), cam->resY());
     std::vector<std::thread> threads(numThreads);
     for (auto iter = threads.begin(); iter != threads.end(); ++iter)

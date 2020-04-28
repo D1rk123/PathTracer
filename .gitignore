@@ -1,5 +1,6 @@
 .vs
 *.ppm
+*.exr
 Debug
 PathTracer/Debug
 Release
