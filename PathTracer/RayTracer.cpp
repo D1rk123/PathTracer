@@ -145,7 +145,7 @@ void RayTracer::renderPixel(int x, int y, ImageRgb* result, int numSamples)
                 reflectionScale *= intersection.color;
                 pixelColor += reflectionScale * calcDirectIllumination(intersectionPoint, intersection.normal) * (1 / Constants::pi);
 
-                if (rouletteSampler(mersenneTwister) > rouletteFactor)
+                if (rouletteSampler(mersenneTwister) < rouletteFactor)
                 {
                     //make new ray
                     ray.orig = intersectionPoint;
@@ -167,6 +167,11 @@ void RayTracer::renderPixel(int x, int y, ImageRgb* result, int numSamples)
             {
                 ray.dir = glm::reflect(ray.dir, intersection.normal);
                 ray.orig = intersectionPoint + (intersection.normal * 0.001f);
+            }
+            else if (intersection.materialType == MaterialType::emissive)
+            {
+                pixelColor += reflectionScale * intersection.color;
+                break;
             }
         }
     }

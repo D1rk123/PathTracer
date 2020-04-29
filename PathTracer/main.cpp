@@ -55,6 +55,7 @@ RayTracer makeCornellBoxScene()
     tracer.addObject(Sphere({ 0.1, 0.1, 0.9 }, 0.2f, { 0.85, 0.85, 0.85 }, MaterialType::mirror));
     //tracer.addObject(Sphere({ 0.55, -0.35, 1.25}, 0.25f, { 0.85, 0.85, 0.85 }));
     //tracer.addObject(Sphere({ 0.0, -0.8, 1.0 }, 0.15f, { 0.85, 0.85, 0.85 }, MaterialType::mirror));
+    //tracer.addObject(Sphere({ 0, 1.0, 1 }, 0.3f, { 20, 20, 20 }, MaterialType::emissive));
     tracer.addPointLight(PointLight({ 0, 0.95, 1 }, { 0.85, 0.85, 0.85 }, 2));
 
     return tracer;

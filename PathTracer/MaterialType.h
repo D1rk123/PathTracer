@@ -3,5 +3,6 @@
 enum class MaterialType
 {
 	diffuse,
-	mirror
+	mirror,
+	emissive
 };
