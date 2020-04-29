@@ -124,39 +124,49 @@ void RayTracer::renderPixel(int x, int y, ImageRgb* result, int numSamples)
     glm::vec3 pixelColor(0, 0, 0);
     for (int i = 0; i < numSamples; ++i)
     {
-        IntersectionResult intersection;
         glm::vec3 reflectionScale(1, 1, 1);
-        bool continueTracing = true;
         Ray ray = cam->generateRay(x, y);
+        int numBounces = 0;
+        bool hitMirror = false;
+        std::string series;
 
-        while (continueTracing)
+        while (true)//numBounces < 50)
         {
-            intersection = testIntersection(ray);
-            if (intersection.distance == std::numeric_limits<float>::infinity())
+            numBounces++;
+            IntersectionResult intersection = testIntersection(ray);
+            if (!intersection.foundIntersection())
             {
                 break;
             }
-            glm::vec3 intersectionPoint = ray.orig + ray.dir * intersection.distance;
+            glm::vec3 intersectionPoint = ray.orig + ray.dir *std::max(0.0f, intersection.distance - Constants::minIntersectionDistance);
 
-            reflectionScale *= intersection.color;
-            pixelColor += reflectionScale * calcDirectIllumination(intersectionPoint, intersection.normal) * (1 / Constants::pi);
-
-            if (rouletteSampler(mersenneTwister) > rouletteFactor)
+            if (intersection.materialType == MaterialType::diffuse)
             {
-                //make new ray
-                ray.orig = intersectionPoint;
-                ray.dir = glm::ballRand(1.0f);
-                float dotNewNormal = glm::dot(ray.dir, intersection.normal);
-                if (dotNewNormal < 0)
+                reflectionScale *= intersection.color;
+                pixelColor += reflectionScale * calcDirectIllumination(intersectionPoint, intersection.normal) * (1 / Constants::pi);
+
+                if (rouletteSampler(mersenneTwister) > rouletteFactor)
                 {
-                    ray.dir = -ray.dir;
-                    dotNewNormal = -dotNewNormal;
+                    //make new ray
+                    ray.orig = intersectionPoint;
+                    ray.dir = glm::ballRand(1.0f);
+                    float dotNewNormal = glm::dot(ray.dir, intersection.normal);
+                    if (dotNewNormal < 0)
+                    {
+                        ray.dir = -ray.dir;
+                        dotNewNormal = -dotNewNormal;
+                    }
+                    reflectionScale *= (1 / rouletteFactor) * dotNewNormal * 2;
                 }
-                reflectionScale *= (1 / rouletteFactor) * dotNewNormal * 2;
+                else
+                {
+                    break;
+                }
             }
-            else
+            else if (intersection.materialType == MaterialType::mirror)
             {
-                continueTracing = false;
+                ray.dir = glm::reflect(ray.dir, intersection.normal);
+                ray.orig = intersectionPoint + (intersection.normal * 0.001f);
             }
         }
     }

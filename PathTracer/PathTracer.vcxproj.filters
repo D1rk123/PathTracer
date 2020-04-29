@@ -51,6 +51,9 @@
     <ClInclude Include="IntersectionResult.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MaterialType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

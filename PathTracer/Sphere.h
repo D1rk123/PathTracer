@@ -14,17 +14,21 @@ class Sphere : public SceneObject
     const glm::vec3 color;
 
 public:
-    Sphere(const glm::vec3 pos, const float radius, const glm::vec3 color)
-        : pos(pos), radius(radius), color(color)
+    Sphere(const glm::vec3 pos, const float radius, const glm::vec3 color, MaterialType materialType = MaterialType::diffuse)
+        : SceneObject(materialType), pos(pos), radius(radius), color(color)
     {
     }
 
-    IntersectionResult testIntersection(const Ray ray) override
+    IntersectionResult testIntersection(const Ray& ray) override
     {
         glm::vec3 q = ray.orig - pos;
         //float a = glm::dot(ray.dir, ray.dir);
         //assume ray.dir is a unit vector, so a is 1 and falls out of all equations
         float b = 2.0f * glm::dot(ray.dir, q);
+        if (b > 0)
+        {
+            return IntersectionResult::makeNoIntersectionFound();
+        }
         float c = glm::dot(q, q) - radius * radius;
 
         float discriminantSquared = b * b - 4.0f * c;
@@ -36,11 +40,11 @@ public:
         const float distance1 = (-b + discriminant) / 2.0f;
         const float distance2 = (-b - discriminant) / 2.0f;
         float finalDistance = std::numeric_limits<float>::infinity();
-        if (distance1 > Constants::minIntersectionDistance)
+        if (distance1 > 0)
         {
             finalDistance = distance1;
         }
-        if (distance2 > Constants::minIntersectionDistance && distance2 < finalDistance)
+        if (distance2 > 0 && distance2 < finalDistance)
         {
             finalDistance = distance2;
         }
@@ -52,6 +56,6 @@ public:
         auto intersectionPoint = ray.orig + ray.dir * finalDistance;
         auto normal = glm::normalize(intersectionPoint - pos);
 
-        return IntersectionResult(finalDistance, normal, color);
+        return IntersectionResult(finalDistance, normal, color, materialType);
     }
 };

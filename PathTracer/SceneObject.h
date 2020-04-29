@@ -2,9 +2,17 @@
 
 #include "IntersectionResult.h"
 #include "Ray.h"
+#include "MaterialType.h"
 
 class SceneObject
 {
 public:
-	virtual IntersectionResult testIntersection(const Ray ray) = 0;
+	MaterialType materialType;
+
+	SceneObject(MaterialType materialType)
+		: materialType(materialType)
+	{
+
+	}
+	virtual IntersectionResult testIntersection(const Ray& ray) = 0;
 };

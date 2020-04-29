@@ -164,6 +164,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="IntersectionResult.h" />
+    <ClInclude Include="MaterialType.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="PointLight.h" />

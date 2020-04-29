@@ -50,8 +50,11 @@ RayTracer makeCornellBoxScene()
     tracer.addObject(Plane({ 1,0,0 }, -1, { 0.85, 0, 0 }));
     tracer.addObject(Plane({ -1,0,0 }, -1, { 0, 0.85, 0 }));
     tracer.addObject(Plane({ 0,0,-1 }, -2, { 0.85, 0.85, 0.85 }));
-    tracer.addObject(Sphere({ -0.35, -0.65, 1.5}, 0.35f, { 0.85, 0.85, 0.85 }));
-    tracer.addObject(Sphere({ 0.55, -0.35, 1.25}, 0.25f, { 0.85, 0.85, 0.85 }));
+    tracer.addObject(Sphere({ -0.6, -0.7, 1.2}, 0.3f, { 0.85, 0.85, 0.85 }));
+    tracer.addObject(Sphere({ 0.4, -0.7, 1.4 }, 0.3f, { 0.85, 0.85, 0.85 }, MaterialType::mirror));
+    tracer.addObject(Sphere({ 0.1, 0.1, 0.9 }, 0.2f, { 0.85, 0.85, 0.85 }, MaterialType::mirror));
+    //tracer.addObject(Sphere({ 0.55, -0.35, 1.25}, 0.25f, { 0.85, 0.85, 0.85 }));
+    //tracer.addObject(Sphere({ 0.0, -0.8, 1.0 }, 0.15f, { 0.85, 0.85, 0.85 }, MaterialType::mirror));
     tracer.addPointLight(PointLight({ 0, 0.95, 1 }, { 0.85, 0.85, 0.85 }, 2));
 
     return tracer;
@@ -66,7 +69,7 @@ int main()
     //ImagePpm::writeToPpm(depthImg, "depth.ppm");
     auto directIllumImg = tracer.renderDirectLight(1);
     directIllumImg.writeToPpm("directIllum.ppm");
-    auto resultImg = tracer.render(2500, 11);
+    auto resultImg = tracer.render(250, 11);
     resultImg.writeToExr("fullResult.exr");
     resultImg.writeToPpm("fullResult.ppm");
 }

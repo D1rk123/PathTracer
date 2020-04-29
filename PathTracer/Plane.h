@@ -16,13 +16,13 @@ class Plane : public SceneObject
     const glm::vec3 color;
 public:
 
-    Plane(const glm::vec3 normal, const float offset, const glm::vec3 color)
-        : normal(normal), offset(offset), color(color)
+    Plane(const glm::vec3 normal, const float offset, const glm::vec3 color, MaterialType materialType = MaterialType::diffuse)
+        : SceneObject(materialType), normal(normal), offset(offset), color(color)
     {
     }
 
     //Two-sided intersection test
-    IntersectionResult testIntersection(const Ray ray) override
+    IntersectionResult testIntersection(const Ray& ray) override
     {
         const float origDistance = glm::dot(ray.orig, normal);
         const float localDir = glm::dot(ray.dir, normal);
@@ -36,6 +36,6 @@ public:
         {
             return IntersectionResult::makeNoIntersectionFound();
         }
-        return IntersectionResult(distance, normal, color);
+        return IntersectionResult(distance, normal, color, materialType);
     }
 };
