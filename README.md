@@ -8,6 +8,7 @@ This is a hobby project in which I implemented Monte Carlo path tracing for phys
   * 2 Types of geometry (spheres and infinite planes)
   * 3 Materials (diffuse colored surfaces, mirrors and glass)
   * 2 Types of light sources (point lights with next event estimation or emissive surfaces)
+  * Saving images as HDR exr files and LDR ppm files
 
 
 ![Example Render](https://raw.githubusercontent.com/D1rk123/PathTracer/master/ExampleImages/glassMirrorDiffuseExample.png)
