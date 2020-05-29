@@ -44,19 +44,21 @@ RayTracer makeCornellBoxSceneOneColorBigShadow()
 
 RayTracer makeCornellBoxScene()
 {
-    RayTracer tracer(PerspectiveCamera(1050, 750, glm::mat3(1.0f), glm::vec3(0, 0, 0), 90.0f));
+    RayTracer tracer(PerspectiveCamera(700, 500, glm::mat3(1.0f), glm::vec3(0, 0, 0), 90.0f));
     tracer.addObject(Plane({ 0,1,0 }, -1, { 0.85, 0.85, 0.85 }));
     tracer.addObject(Plane({ 0,-1,0 }, -1, { 0.85, 0.85, 0.85 }));
     tracer.addObject(Plane({ 1,0,0 }, -1, { 0.85, 0, 0 }));
     tracer.addObject(Plane({ -1,0,0 }, -1, { 0, 0.85, 0 }));
     tracer.addObject(Plane({ 0,0,-1 }, -2, { 0.85, 0.85, 0.85 }));
-    tracer.addObject(Sphere({ -0.6, -0.7, 1.2}, 0.3f, { 0.85, 0.85, 0.85 }));
-    tracer.addObject(Sphere({ 0.4, -0.7, 1.4 }, 0.3f, { 0.85, 0.85, 0.85 }, MaterialType::mirror));
-    tracer.addObject(Sphere({ 0.1, 0.1, 0.9 }, 0.2f, { 0.85, 0.85, 0.85 }, MaterialType::mirror));
+    tracer.addObject(Plane({ 0,0,1 }, -0.01, { 0.85, 0.85, 0.85 }));
+    tracer.addObject(Sphere({ -0.6, -0.7, 1.1}, 0.3f, { 0.85, 0.85, 0.85 }));
+    tracer.addObject(Sphere({ 0.05, -0.7, 1.3 }, 0.3f, { 0.85, 0.85, 0.85 }, MaterialType::diffuse));
+    //tracer.addObject(Sphere({ 0.68, -0.55, 1.1 }, 0.2f, { 0.85, 0.85, 0.85 }, MaterialType::glass));
+    tracer.addObject(Sphere({ 0.65, -0.55, 1.1 }, 0.25f, { 0.85, 0.85, 0.85 }, MaterialType::diffuse));
     //tracer.addObject(Sphere({ 0.55, -0.35, 1.25}, 0.25f, { 0.85, 0.85, 0.85 }));
     //tracer.addObject(Sphere({ 0.0, -0.8, 1.0 }, 0.15f, { 0.85, 0.85, 0.85 }, MaterialType::mirror));
-    //tracer.addObject(Sphere({ 0, 1.0, 1 }, 0.3f, { 20, 20, 20 }, MaterialType::emissive));
-    tracer.addPointLight(PointLight({ 0, 0.95, 1 }, { 0.85, 0.85, 0.85 }, 2));
+    tracer.addObject(Sphere({ 0, 1.0, 1 }, 0.3f, { 20, 20, 20 }, MaterialType::emissive));
+    //tracer.addPointLight(PointLight({ 0, 0.95, 1 }, { 0.85, 0.85, 0.85 }, 2));
 
     return tracer;
 }
@@ -70,7 +72,7 @@ int main()
     //ImagePpm::writeToPpm(depthImg, "depth.ppm");
     auto directIllumImg = tracer.renderDirectLight(1);
     directIllumImg.writeToPpm("directIllum.ppm");
-    auto resultImg = tracer.render(250, 11);
+    auto resultImg = tracer.render(125000, 11);
     resultImg.writeToExr("fullResult.exr");
     resultImg.writeToPpm("fullResult.ppm");
 }

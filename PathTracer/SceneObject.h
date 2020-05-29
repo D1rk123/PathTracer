@@ -15,4 +15,5 @@ public:
 
 	}
 	virtual IntersectionResult testIntersection(const Ray& ray) = 0;
+	virtual Ray transmit(const glm::vec3& intersection, const glm::vec3& direction, glm::vec3* outNormal) = 0;
 };

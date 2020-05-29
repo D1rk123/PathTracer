@@ -56,6 +56,25 @@ public:
         auto intersectionPoint = ray.orig + ray.dir * finalDistance;
         auto normal = glm::normalize(intersectionPoint - pos);
 
-        return IntersectionResult(finalDistance, normal, color, materialType);
+        return IntersectionResult(finalDistance, normal, color, materialType, this);
+    }
+
+    Ray transmit(const glm::vec3& intersection, const glm::vec3& direction, glm::vec3* outNormal) override
+    {
+        glm::vec3 q = intersection - pos;
+        //float a = glm::dot(ray.dir, ray.dir);
+        //assume ray.dir is a unit vector, so a is 1 and falls out of all equations
+        float b = 2.0f * glm::dot(direction, q);
+        float c = glm::dot(q, q) - radius * radius;
+
+        float discriminantSquared = b * b - 4.0f * c;
+        const float discriminant = sqrtf(discriminantSquared);
+        const float distance1 = (-b + discriminant) / 2.0f;
+        const float distance2 = (-b - discriminant) / 2.0f;
+        const float finalDistance = std::max(distance1, distance2);
+
+        auto intersectionPoint = intersection + direction * finalDistance;
+        *outNormal = glm::normalize(intersectionPoint - pos);
+        return { intersectionPoint , direction };
     }
 };

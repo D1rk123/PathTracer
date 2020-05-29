@@ -20,6 +20,7 @@ class RayTracer
     glm::vec3 calcDirectIllumination(const glm::vec3& point, const glm::vec3& intersectionNormal);
     void renderThread(ImageRgb* result, int numSamples, workDistributor* distributor);
     void renderPixel(int x, int y, ImageRgb* result, int numSamples);
+    float reflectionProbability(const glm::vec3& dir, const glm::vec3& normal, const float n1, const float n2);
 
 
 public:

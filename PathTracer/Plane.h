@@ -36,6 +36,12 @@ public:
         {
             return IntersectionResult::makeNoIntersectionFound();
         }
-        return IntersectionResult(distance, normal, color, materialType);
+        return IntersectionResult(distance, normal, color, materialType, this);
+    }
+
+    Ray transmit(const glm::vec3& intersection, const glm::vec3& direction, glm::vec3* outNormal) override
+    {
+        *outNormal = normal;
+        return { intersection , direction };
     }
 };

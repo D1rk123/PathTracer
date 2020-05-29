@@ -114,12 +114,30 @@ ImageRgb RayTracer::renderDirectLight(int numSamples)
     return result;
 }
 
+float RayTracer::reflectionProbability(const glm::vec3& dir, const glm::vec3& normal, const float n1, const float n2)
+{
+    /*float cosTheta = -glm::dot(dir, normal);
+    float left = n1 * cosTheta;
+
+    float sinThetaSquared = 1 - (cosTheta * cosTheta);
+    float n1DivN2 = n1 / n2;
+    float right = n2 * sqrt(1 - (n1DivN2 * n1DivN2 * sinThetaSquared));
+
+    float division = (left - right) / (left + right);
+    return division * division;*/
+
+    float cosTheta = -glm::dot(dir, normal);
+    float sqrtR0 = (n1 - n2) / (n1 + n2);
+    float r0 = sqrtR0 * sqrtR0;
+    return r0 + (1 - r0) * powf((1 - cosTheta), 5);
+}
+
 void RayTracer::renderPixel(int x, int y, ImageRgb* result, int numSamples)
 {
     std::random_device rd;
     std::mt19937 mersenneTwister(rd());
     std::uniform_real_distribution<float> rouletteSampler(0, 1);
-    constexpr float rouletteFactor = 0.85f;
+    constexpr float rouletteFactor = 0.93f;
     //glm::vec<3, double> pixelColor(0, 0, 0);
     glm::vec3 pixelColor(0, 0, 0);
     for (int i = 0; i < numSamples; ++i)
@@ -167,6 +185,27 @@ void RayTracer::renderPixel(int x, int y, ImageRgb* result, int numSamples)
             {
                 ray.dir = glm::reflect(ray.dir, intersection.normal);
                 ray.orig = intersectionPoint + (intersection.normal * 0.001f);
+            }
+            else if (intersection.materialType == MaterialType::glass)
+            {
+                const float reflectionProb = reflectionProbability(ray.dir, intersection.normal, 1, 1.5);
+                if (rouletteSampler(mersenneTwister) < reflectionProb)
+                {
+                    ray.dir = glm::reflect(ray.dir, intersection.normal);
+                    ray.orig = intersectionPoint + (intersection.normal * 0.001f);
+                }
+                else
+                {
+                    glm::vec3 outNormal;
+                    ray = intersection.object->transmit(intersectionPoint, glm::refract(ray.dir, intersection.normal, (1.0f / 1.5f)), &outNormal);
+                    float insideReflectionProb = reflectionProbability(ray.dir, -outNormal, 1.5, 1);
+                    for (int i=0; i<5 && rouletteSampler(mersenneTwister) < insideReflectionProb; ++i)
+                    {
+                        ray = intersection.object->transmit(intersectionPoint, glm::reflect(ray.dir, -outNormal), &outNormal);
+                        insideReflectionProb = reflectionProbability(ray.dir, -outNormal, 1.5, 1);
+                    }
+                    ray.dir = glm::refract(ray.dir, -outNormal, 1.5f);
+                }
             }
             else if (intersection.materialType == MaterialType::emissive)
             {

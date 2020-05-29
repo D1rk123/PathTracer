@@ -9,8 +9,8 @@ std::vector<unsigned char> ImageRgb::convertTo8Bit() const
 
     auto sortedPixelData = pixelData;
     std::sort(sortedPixelData.begin(), sortedPixelData.end());
-    double max = (sortedPixelData[static_cast<int>(sortedPixelData.size() * 0.5)]
-        + sortedPixelData[static_cast<int>(sortedPixelData.size() * 0.95)] * 2) / 3;
+    double max = (sortedPixelData[static_cast<int>(sortedPixelData.size() * 0.5)] * 2
+        + sortedPixelData[static_cast<int>(sortedPixelData.size() * 0.95)]) / 2;
     std::cout << max << std::endl;
 
     //double max = static_cast<double>(*std::max_element(pixelData.cbegin(), pixelData.cend()));
