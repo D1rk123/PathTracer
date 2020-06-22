@@ -59,9 +59,9 @@ std::vector<float> ImageRgb::getChannel(ColorChannel channel) const
         break;
     }
 
-    const int resultSize = resolutionX * resolutionY;
+    const auto resultSize = resolutionX * resolutionY;
     std::vector<float> result(resolutionX * resolutionY);
-    for (int i = 0; i < resultSize; ++i)
+    for (PixPosT i = 0; i < resultSize; ++i)
     {
         result[i] = pixelData[i * 3 + channelOffset];
     }
@@ -87,8 +87,8 @@ void ImageRgb::writeToExr(const std::string path)
 
     exrImage.num_channels = 3;
     exrImage.images = (unsigned char**)image_ptr;
-    exrImage.width = resolutionX;
-    exrImage.height = resolutionY;
+    exrImage.width = static_cast<int>(resolutionX);
+    exrImage.height = static_cast<int>(resolutionY);
 
     header.num_channels = 3;
 

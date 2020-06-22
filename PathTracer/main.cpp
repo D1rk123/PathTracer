@@ -50,7 +50,7 @@ RayTracer makeCornellBoxScene()
     tracer.addObject(Plane({ 1,0,0 }, -1, { 0.85, 0, 0 }));
     tracer.addObject(Plane({ -1,0,0 }, -1, { 0, 0.85, 0 }));
     tracer.addObject(Plane({ 0,0,-1 }, -2, { 0.85, 0.85, 0.85 }));
-    tracer.addObject(Plane({ 0,0,1 }, -0.01, { 0.85, 0.85, 0.85 }));
+    tracer.addObject(Plane({ 0,0,1 }, -0.01f, { 0.85, 0.85, 0.85 }));
     tracer.addObject(Sphere({ -0.6, -0.7, 1.1}, 0.3f, { 0.85, 0.85, 0.85 }));
     tracer.addObject(Sphere({ 0.05, -0.7, 1.3 }, 0.3f, { 0.85, 0.85, 0.85 }, MaterialType::diffuse));
     //tracer.addObject(Sphere({ 0.68, -0.55, 1.1 }, 0.2f, { 0.85, 0.85, 0.85 }, MaterialType::glass));
