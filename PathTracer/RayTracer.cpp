@@ -77,13 +77,16 @@ glm::vec3 RayTracer::calcDirectIllumination(const glm::vec3& point, const glm::v
 
 ImageRgb RayTracer::renderDepth()
 {
+    constexpr float maxDistance = 10000.0f;
     ImageRgb result(cam->resX(), cam->resY());
+
     for (int x = 0; x < cam->resX(); ++x)
     {
         for (int y = 0; y < cam->resY(); ++y)
         {
             auto intersection = testIntersection(cam->generateRay(x, y));
-            result.set(x, y, { intersection.distance, intersection.distance, intersection.distance });
+            float clippedDistance = std::min(intersection.distance, maxDistance);
+            result.set(x, y, { clippedDistance, clippedDistance, clippedDistance });
         }
     }
     return result;
